@@ -159,7 +159,7 @@ func (b *backend) pathRewrapWrite(ctx context.Context, req *logical.Request, d *
 		}
 
 		paddingScheme := d.Get("padding_scheme").(string)
-		plaintext, err := p.Decrypt(item.DecodedContext, item.DecodedNonce, item.Ciphertext, paddingScheme)
+		plaintext, err := p.DecryptWithAlgorithm(item.DecodedContext, item.DecodedNonce, item.Ciphertext, paddingScheme)
 		if err != nil {
 			switch err.(type) {
 			case errutil.UserError:
@@ -175,7 +175,7 @@ func (b *backend) pathRewrapWrite(ctx context.Context, req *logical.Request, d *
 			warnAboutNonceUsage = true
 		}
 
-		ciphertext, err := p.Encrypt(item.KeyVersion, item.DecodedContext, item.DecodedNonce, plaintext, paddingScheme)
+		ciphertext, err := p.EncryptWithAlgorithm(item.KeyVersion, item.DecodedContext, item.DecodedNonce, plaintext, paddingScheme)
 		if err != nil {
 			switch err.(type) {
 			case errutil.UserError:

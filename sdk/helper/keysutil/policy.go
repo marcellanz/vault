@@ -878,11 +878,19 @@ func (p *Policy) convergentVersion(ver int) int {
 	return convergentVersion
 }
 
-func (p *Policy) Encrypt(ver int, context, nonce []byte, value string, paddingScheme string) (string, error) {
+func (p *Policy) Encrypt(ver int, context, nonce []byte, value string) (string, error) {
+	return p.EncryptWithFactory(ver, context, nonce, value, "oaep", nil)
+}
+
+func (p *Policy) EncryptWithAlgorithm(ver int, context, nonce []byte, value string, paddingScheme string) (string, error) {
 	return p.EncryptWithFactory(ver, context, nonce, value, paddingScheme, nil)
 }
 
-func (p *Policy) Decrypt(context, nonce []byte, value string, paddingScheme string) (string, error) {
+func (p *Policy) Decrypt(context, nonce []byte, value string) (string, error) {
+	return p.DecryptWithFactory(context, nonce, value, "oaep", nil)
+}
+
+func (p *Policy) DecryptWithAlgorithm(context, nonce []byte, value string, paddingScheme string) (string, error) {
 	return p.DecryptWithFactory(context, nonce, value, paddingScheme, nil)
 }
 
