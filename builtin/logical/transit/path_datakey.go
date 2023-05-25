@@ -39,7 +39,8 @@ ciphertext; "wrapped" will return the ciphertext only.`,
 			},
 
 			"padding_scheme": {
-				Type: framework.TypeString,
+				Type:    framework.TypeString,
+				Default: "oaep",
 				Description: `The padding scheme to use for decrypt. Currently only applies to RSA key types.
 Options are 'oaep' or 'pkcs1v15'. Defaults to 'oaep'`,
 			},
@@ -148,7 +149,7 @@ func (b *backend) pathDatakeyWrite(ctx context.Context, req *logical.Request, d 
 	}
 
 	paddingScheme := d.Get("padding_scheme").(string)
-	ciphertext, err := p.Encrypt(ver, context, nonce, base64.StdEncoding.EncodeToString(newKey), paddingScheme)
+	ciphertext, err := p.EncryptWithAlgorithm(ver, context, nonce, base64.StdEncoding.EncodeToString(newKey), paddingScheme)
 	if err != nil {
 		switch err.(type) {
 		case errutil.UserError:
