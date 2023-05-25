@@ -481,8 +481,6 @@ func (b *backend) pathEncryptWrite(ctx context.Context, req *logical.Request, d 
 			warnAboutNonceUsage = true
 		}
 
-		paddingScheme := d.Get("padding_scheme").(string)
-		ciphertext, err := p.Encrypt(item.KeyVersion, item.DecodedContext, item.DecodedNonce, item.Plaintext, paddingScheme)
 		var factory interface{}
 		if item.AssociatedData != "" {
 			if !p.Type.AssociatedDataSupported() {
@@ -509,7 +507,8 @@ func (b *backend) pathEncryptWrite(ctx context.Context, req *logical.Request, d 
 			}
 		}
 
-		ciphertext, err := p.EncryptWithFactory(item.KeyVersion, item.DecodedContext, item.DecodedNonce, item.Plaintext, factory, managedKeyFactory)
+		paddingScheme := d.Get("padding_scheme").(string)
+		ciphertext, err := p.EncryptWithFactory(item.KeyVersion, item.DecodedContext, item.DecodedNonce, item.Plaintext, paddingScheme, factory, managedKeyFactory)
 		if err != nil {
 			switch err.(type) {
 			case errutil.InternalError:
