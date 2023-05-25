@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
@@ -56,7 +61,7 @@ export default class MfaLoginEnforcementForm extends Component {
   }
 
   async flattenTargets() {
-    for (let { label, key } of this.targetTypes) {
+    for (const { label, key } of this.targetTypes) {
       const targetArray = await this.args.model[key];
       const targets = targetArray.map((value) => ({ label, key, value }));
       this.targets.addObjects(targets);

@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 /* eslint-env node */
 /* eslint-disable no-console */
 /* eslint-disable no-process-exit */
@@ -21,7 +26,7 @@ async function processLines(input, eachLine = () => {}) {
 
 (async function () {
   try {
-    let vault = testHelper.run(
+    const vault = testHelper.run(
       'vault',
       [
         'server',

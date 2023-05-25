@@ -87,7 +87,7 @@ node completes the request anyway, returning a warning in the response.
 
 This mitigation option still exists in Vault 1.7, though now there is a
 configuration option to adjust the wait time:
-[best_effort_wal_wait_duration](/docs/configuration/replication).
+[best_effort_wal_wait_duration](/vault/docs/configuration/replication).
 
 ## Vault 1.7 Mitigations
 
@@ -97,13 +97,13 @@ There are now a variety of other mitigations available:
 - per-request option to conditionally forward the request to the active node
   if it would otherwise result in a stale read
 - per-request option to fail requests if they might result in a stale read
-- Vault Agent configuration to do the above for proxied requests
+- Vault Proxy configuration to do the above for proxied requests
 
 The remainder of this document describes the tradeoffs of these mitigations and
 how to use them.
 
 Note that any headers requesting forwarding are disabled by default, and must
-be enabled using [allow_forwarding_via_header](/docs/configuration/replication).
+be enabled using [allow_forwarding_via_header](/vault/docs/configuration/replication).
 
 ### Unconditional Forwarding (Performance standbys only)
 
@@ -173,22 +173,22 @@ methods for propagating the X-Vault-Index response header into the request
 header of subsequent requests. Those not using the Vault Go API will want
 to build equivalent functionality into their client library.
 
-### Vault Agent and consistency headers
+### Vault Proxy and consistency headers
 
-Vault Agent Caching will proxy incoming requests to Vault. There is
-new Agent configuration available in the `cache` stanza that allows making use
+When configured, the [Vault API Proxy](/vault/docs/agent-and-proxy/proxy/apiproxy) will proxy incoming requests to Vault. There is
+Proxy configuration available in the `api_proxy` stanza that allows making use
 of some of the above mitigations without modifying clients.
 
-By setting `enforce_consistency="always"`, Agent will always provide
+By setting `enforce_consistency="always"`, Proxy will always provide
 the `X-Vault-Index` consistency header. The value it uses for the header
-will be based on the responses that have passed through the Agent previously.
+will be based on the responses that have passed through the Proxy previously.
 
 The option `when_inconsistent` controls how stale reads are prevented:
 
 - `"fail"` means that when a `412` response is seen, it is returned to the client
-- `"retry"` means that `412` responses will be retried automatically by Agent,
+- `"retry"` means that `412` responses will be retried automatically by Proxy,
   so the client doesn't have to deal with them
-- `"forward"` makes Agent provide the
+- `"forward"` makes Proxy provide the
   `X-Vault-Inconsistent: forward-active-node` header as described above under
   Conditional Forwarding
 
@@ -202,11 +202,11 @@ a 412 status code. The Vault Go API automatically retries when receiving 412s, s
 unless there is a considerable replication delay, users will experience
 read-after-write consistency.
 
-The replication option [allow_forwarding_via_token](/docs/configuration/replication)
+The replication option [allow_forwarding_via_token](/vault/docs/configuration/replication)
 can be used to enforce requests that would have returned 412s in the
 aforementioned way will be forwarded instead to the active node.
 
-Refer to the [Server Side Consistent Token FAQ](/docs/faq/ssct) for details.
+Refer to the [Server Side Consistent Token FAQ](/vault/docs/faq/ssct) for details.
 
 ## Client API helpers
 

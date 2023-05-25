@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package database
 
 import (
@@ -24,10 +27,11 @@ import (
 )
 
 const (
-	databaseConfigPath     = "config/"
-	databaseRolePath       = "role/"
-	databaseStaticRolePath = "static-role/"
-	minRootCredRollbackAge = 1 * time.Minute
+	operationPrefixDatabase = "database"
+	databaseConfigPath      = "config/"
+	databaseRolePath        = "role/"
+	databaseStaticRolePath  = "static-role/"
+	minRootCredRollbackAge  = 1 * time.Minute
 )
 
 type dbPluginInstance struct {
@@ -336,7 +340,7 @@ func (b *databaseBackend) GetConnectionWithConfig(ctx context.Context, name stri
 		return nil, err
 	}
 
-	dbw, err := newDatabaseWrapper(ctx, config.PluginName, b.System(), b.logger)
+	dbw, err := newDatabaseWrapper(ctx, config.PluginName, config.PluginVersion, b.System(), b.logger)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create database instance: %w", err)
 	}

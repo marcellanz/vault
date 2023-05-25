@@ -1,3 +1,6 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 //go:build !enterprise
 
 package vault
@@ -10,8 +13,14 @@ import (
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
-func addPathCheckers(*Core, *MountEntry, logical.Backend, string)             {}
-func removePathCheckers(*Core, *MountEntry, string)                           {}
+func addPathCheckers(c *Core, entry *MountEntry, backend logical.Backend, viewPath string) {
+	c.addBackendWriteForwardedPaths(backend, viewPath)
+}
+
+func removePathCheckers(c *Core, entry *MountEntry, viewPath string) {
+	c.writeForwardedPaths.RemovePathPrefix(viewPath)
+}
+
 func addAuditPathChecker(*Core, *MountEntry, *BarrierView, string)            {}
 func removeAuditPathChecker(*Core, *MountEntry)                               {}
 func addFilterablePath(*Core, string)                                         {}
@@ -47,10 +56,18 @@ func verifyNamespace(*Core, *namespace.Namespace, *MountEntry) error { return ni
 // mount-specific entries; because this should be called when setting
 // up a mountEntry, it doesn't check to ensure that me is not nil
 func (c *Core) mountEntrySysView(entry *MountEntry) extendedSystemView {
-	return extendedSystemViewImpl{
+	esi := extendedSystemViewImpl{
 		dynamicSystemView{
-			core:       c,
-			mountEntry: entry,
+			core:        c,
+			mountEntry:  entry,
+			perfStandby: c.perfStandby,
 		},
 	}
+
+	// Due to complexity in the ACME interface, only return it when we
+	// are a PKI plugin that needs it.
+	if entry.Type != "pki" {
+		return esi
+	}
+	return c.NewAcmeBillingSystemView(esi)
 }
